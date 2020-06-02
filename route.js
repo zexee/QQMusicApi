@@ -21,9 +21,6 @@ jsonFile.readFile(__dirname + '/data/cookie.json')
     global.userCookie = {}
   });
 
-// 每5分钟存一下数据
-setInterval(() => dataHandle.saveInfo(), 60000 * 5);
-
 fs.readdirSync(path.join(__dirname, 'routes')).reverse().forEach(file => {
   const filename = file.replace(/\.js$/, '');
   router.use(`/${filename}`, (req, res, next) => {
