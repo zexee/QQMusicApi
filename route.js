@@ -6,7 +6,9 @@ const jsonFile = require('jsonfile');
 
 const express = require('express');
 const router = express.Router();
+var config = require('./bin/config');
 
+global.QQ = config.qq;
 jsonFile.readFile(__dirname + '/data/allCookies.json')
   .then((res) => {
     global.allCookies = res;
