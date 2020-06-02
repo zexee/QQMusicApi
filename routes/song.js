@@ -127,7 +127,7 @@ router.post('/finds', async (req, res) => {
 // 批量获取歌曲 url
 const getUrls = async (req, res) => {
   const obj = { ...req.query, ...req.body };
-  let uin = global.userCookie.uin;
+  let uin = global.QQ
   if (Number(obj.ownCookie)) {
     uin = req.cookies.uin || uin;
   }
