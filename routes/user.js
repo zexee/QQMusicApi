@@ -14,12 +14,9 @@ router.get('/cookie', (req, res) => {
 });
 
 router.get('/getCookie', (req, res) => {
-  const { id } = req.query;
+  var { id } = req.query;
   if (!id) {
-    return res.send({
-      result: 500,
-      errMsg: 'id ?'
-    });
+    id = global.QQ
   }
 
   const cookieObj = global.allCookies[id] || [];
@@ -31,6 +28,17 @@ router.get('/getCookie', (req, res) => {
     message: '设置 cookie 成功',
   })
 });
+
+router.get('/', (req, res) => {
+  var html =
+    '<html><body>' +
+    '<form action="setCookie" enctype="application/json">' +
+    '<textarea name="data"></textarea>' +
+    '<button type="submit">Set Cookie</button>' +
+    '</form>' +
+    '</body></html>'
+  res.end(html)
+})
 
 router.post('/setCookie', (req, res) => {
   const { data } = req.body;
@@ -59,13 +67,10 @@ router.post('/setCookie', (req, res) => {
 
 // 获取用户歌单
 router.get('/detail', async (req, res) => {
-  const { id } = req.query;
+  var { id } = req.query;
 
   if (!id) {
-    return res.send({
-      result: 500,
-      errMsg: 'id 不能为空',
-    })
+    id = global.QQ
   }
   const result = await request({
     url: 'http://c.y.qq.com/rsc/fcgi-bin/fcg_get_profile_homepage.fcg',
@@ -90,12 +95,9 @@ router.get('/detail', async (req, res) => {
 
 // 获取用户创建的歌单
 router.get('/songlist', async (req, res) => {
-  const { id, raw } = req.query;
+  var { id, raw } = req.query;
   if (!id) {
-    return res.send({
-      result: 500,
-      errMsg: 'id ?',
-    })
+    id = global.QQ
   }
   const result = await request({
     url: 'https://c.y.qq.com/rsc/fcgi-bin/fcg_user_created_diss',
@@ -153,12 +155,9 @@ router.get('/songlist', async (req, res) => {
 
 // 获取用户收藏的歌单
 router.get('/collect/songlist', async (req, res) => {
-  const { id = req.cookies.uin, pageNo = 1, pageSize = 20, raw } = req.query;
+  var { id, pageNo = 1, pageSize = 200, raw } = req.query;
   if (!id) {
-    return res.send({
-      result: 500,
-      errMsg: 'id ? '
-    })
+    id = global.QQ
   }
   const result = await request({
     url: 'https://c.y.qq.com/fav/fcgi-bin/fcg_get_profile_order_asset.fcg',
@@ -188,12 +187,9 @@ router.get('/collect/songlist', async (req, res) => {
 
 // 获取用户收藏的专辑
 router.get('/collect/album', async (req, res) => {
-  const { id = req.cookies.uin, pageNo = 1, pageSize = 20, raw } = req.query;
+  var { id, pageNo = 1, pageSize = 200, raw } = req.query;
   if (!id) {
-    return res.send({
-      result: 500,
-      errMsg: 'id ? '
-    })
+    id = global.QQ
   }
   const result = await request({
     url: 'https://c.y.qq.com/fav/fcgi-bin/fcg_get_profile_order_asset.fcg',
@@ -223,12 +219,9 @@ router.get('/collect/album', async (req, res) => {
 
 // 获取关注的歌手
 router.get('/follow/singers', async (req, res) => {
-  const { id = req.cookies.uin, pageNo = 1, pageSize = 20, raw } = req.query;
+  var { id, pageNo = 1, pageSize = 200, raw } = req.query;
   if (!id) {
-    return res.send({
-      result: 500,
-      errMsg: 'id 不能为空',
-    })
+    id = global.QQ
   }
 
   const result = await request({
@@ -317,12 +310,9 @@ router.get('/follow', async (req, res) => {
 
 // 获取关注的用户
 router.get('/follow/users', async (req, res) => {
-  const { id = req.cookies.uin, pageNo = 1, pageSize = 20, raw } = req.query;
+  var { id, pageNo = 1, pageSize = 20, raw } = req.query;
   if (!id) {
-    return res.send({
-      result: 500,
-      errMsg: 'id 不能为空',
-    })
+    id = global.QQ
   }
 
   const result = await request({
@@ -359,12 +349,9 @@ router.get('/follow/users', async (req, res) => {
 
 // 获取用户粉丝
 router.get('/fans', async (req, res) => {
-  const { id = req.cookies.uin, pageNo = 1, pageSize = 20, raw } = req.query;
+  var { id, pageNo = 1, pageSize = 200, raw } = req.query;
   if (!id) {
-    return res.send({
-      result: 500,
-      errMsg: 'id 不能为空',
-    })
+    id = global.QQ
   }
 
   const result = await request({
