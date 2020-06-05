@@ -109,8 +109,7 @@ router.get('/daily', async (req, res) => {
       errMsg: '未登录'
     })
   }
-  const listInfo = await request(`http://127.0.0.1:${global.PORT}/songlist?id=${id}`);
-  return res.send(listInfo);
+  return res.redirect('../songlist?id=' + id);
 });
 
 // banner 日推
