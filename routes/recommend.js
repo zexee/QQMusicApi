@@ -98,18 +98,18 @@ router.get('/daily', async (req, res) => {
     dataType: 'raw',
   })
   const $ = cheerio.load(page);
-  const firstList = $('.mod_for_u .playlist__item').first();
-  let id = '';
-  if (firstList.find('.playlist__name').text() === '今日私享') {
-    id = firstList.find('.playlist__link').data('rid');
-  }
-  if (!id) {
-    return res.send({
-      result: 301,
-      errMsg: '未登录'
+  const list = $('.mod_for_u .playlist__item')
+  var ret = {result:100, data:{list:[]}}
+  for (var i = 0; i < list.length; ++i) {
+    if (cheerio('.playlist__link', list[i]).data('albummid')) continue
+    ret.data.list.push({
+      tid: cheerio('.playlist__link', list[i]).data('rid'),
+      title: cheerio('.playlist__pic', list[i]).attr('alt'),
+      cover_url_small: cheerio('.playlist__pic', list[i]).attr('src'),
     })
   }
-  return res.redirect('../songlist?id=' + id);
+  console.log(ret)
+  return res.json(ret)
 });
 
 // banner 日推
