@@ -32,8 +32,8 @@ router.get('/getCookie', (req, res) => {
 router.get('/', (req, res) => {
   var html =
     '<html><body>' +
-    '<form action="setCookie" enctype="application/json">' +
-    '<textarea name="data"></textarea>' +
+    '<form action="setCookie" method="POST" enctype="application/json" style="display:grid;">' +
+    '<textarea name="data" style="height:200px;"></textarea>' +
     '<button type="submit">Set Cookie</button>' +
     '</form>' +
     '</body></html>'
