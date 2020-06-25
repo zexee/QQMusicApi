@@ -15,11 +15,12 @@ router.get('/cookie', (req, res) => {
 });
 
 router.get('/getCookie', (req, res) => {
-  console.log(global.userCookie)
   return res.json(global.userCookie)
 });
 
 function SetLoginCookie(o) {
+  console.log(o)
+  //global.QQ = o.musicid
   const userCookie = {
     wxuin: 'o' + global.QQ,
     qm_keyst: o.music_key,
@@ -64,7 +65,7 @@ function LoginPull(retry, uuid, last) {
     .then((rr) => {
       console.log(rr.data)
       if (rr.data.length == 0) {
-        return LongPull(retry + 1, uuid)
+        return LoginPull(retry + 1, uuid)
       }
       var window = {}
       eval(rr.data)
@@ -79,7 +80,7 @@ function LoginPull(retry, uuid, last) {
 }
 
 router.get('/', (req, res) => {
-  global.UserCookie = {}
+  global.userCookie = {}
   axios.get('https://open.weixin.qq.com/connect/qrconnect?appid=wx48db31d50e334801&redirect_uri=https%3A%2F%2Fy.qq.com%2Fportal%2Fwx_redirect.html%3Flogin_type%3D2%26surl%3Dhttps%3A%2F%2Fy.qq.com%2Fportal%2Fprofile.html%23stat%3Dy_new.top.user_pic%26stat%3Dy_new.top.pop.logout&response_type=code&scope=snsapi_login&state=STATE')
     .then((rr) => {
       var r = rr.data
@@ -123,7 +124,7 @@ router.get('/detail', async (req, res) => {
   var { id } = req.query;
 
   if (!id) {
-    id = global.QQ
+    id = 'o' + global.QQ
   }
   const result = await request({
     url: 'http://c.y.qq.com/rsc/fcgi-bin/fcg_get_profile_homepage.fcg',
