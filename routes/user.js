@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const request  = require('../util/request');
 const jsonFile = require('jsonfile');
+const axios = require('axios');
 
 router.get('/cookie', (req, res) => {
   res.send({
@@ -14,30 +15,82 @@ router.get('/cookie', (req, res) => {
 });
 
 router.get('/getCookie', (req, res) => {
-  var { id } = req.query;
-  if (!id) {
-    id = global.QQ
-  }
-
-  const cookieObj = global.allCookies[id] || [];
-  Object.keys(cookieObj).forEach((k) => {
-    res.cookie(k, cookieObj[k], { expires: new Date(Date.now() + 86400000)});
-  });
-  return res.send({
-    result: 100,
-    message: '设置 cookie 成功',
-  })
+  console.log(global.userCookie)
+  return res.json(global.userCookie)
 });
 
+function SetLoginCookie(o) {
+  const userCookie = {
+    wxuin: 'o' + global.QQ,
+    qm_keyst: o.music_key,
+    qqmusic_key: o.music_key,
+    wxopenid: o.wxopenid,
+    wxrefresh_token: o.wxrefresh_token,
+    wxunionid: o.wxunionid,
+  };
+  global.userCookie = userCookie
+  jsonFile.writeFile(__dirname + '/../data/cookie.json', global.userCookie)
+  console.log(global.userCookie)
+}
+
+function FinishLogin(wxcode) {
+  const instance = axios.create({
+      baseURL: 'https://c.y.qq.com/base/fcgi-bin/',
+      timeout: 10000,
+      headers: {'Referer': 'https://y.qq.com/portal/wx_redirect.html?login_type=2&surl=https://y.qq.com/portal/profile.html'}
+  });
+
+  var url = 'https://c.y.qq.com/base/fcgi-bin/h5_login_wx_get_musickey.fcg?wxcode=' + wxcode + '&appid=wx48db31d50e334801&jsonpCallback=SetLoginCookie'
+  console.log(url)
+  instance.get(url)
+    .then((rr) => {
+      console.log(rr.data)
+      eval(rr.data)
+    })
+}
+
+function LoginPull(retry, uuid, last) {
+  if (retry > 10) return;
+  const instance = axios.create({
+      baseURL: 'https://lp.open.weixin.qq.com/connect/l/',
+      timeout: 30000,
+      headers: {'Referer': 'https://open.weixin.qq.com/connect/qrconnect?appid=wx48db31d50e334801'}
+  });
+
+  var url = 'https://lp.open.weixin.qq.com/connect/l/qrconnect?uuid=' + uuid + '&_=' + (new Date() * 1)
+  if (last) url += '&last=' + last
+  console.log(url)
+  instance.get(url)
+    .then((rr) => {
+      console.log(rr.data)
+      if (rr.data.length == 0) {
+        return LongPull(retry + 1, uuid)
+      }
+      var window = {}
+      eval(rr.data)
+      if (window.wx_errcode == 404) {
+        return LoginPull(0, uuid, 404)
+      }
+      if (window.wx_errcode == 405 && window.wx_code.length > 0) {
+        console.log(window.wx_code)
+        FinishLogin(window.wx_code)
+      }
+    })
+}
+
 router.get('/', (req, res) => {
-  var html =
-    '<html><body>' +
-    '<form action="setCookie" method="POST" enctype="application/json" style="display:grid;">' +
-    '<textarea name="data" style="height:200px;"></textarea>' +
-    '<button type="submit">Set Cookie</button>' +
-    '</form>' +
-    '</body></html>'
-  res.end(html)
+  global.UserCookie = {}
+  axios.get('https://open.weixin.qq.com/connect/qrconnect?appid=wx48db31d50e334801&redirect_uri=https%3A%2F%2Fy.qq.com%2Fportal%2Fwx_redirect.html%3Flogin_type%3D2%26surl%3Dhttps%3A%2F%2Fy.qq.com%2Fportal%2Fprofile.html%23stat%3Dy_new.top.user_pic%26stat%3Dy_new.top.pop.logout&response_type=code&scope=snsapi_login&state=STATE')
+    .then((rr) => {
+      var r = rr.data
+      var startpos = r.indexOf('/connect/qrcode/')
+      var endpos = r.indexOf('"', startpos)
+      var url = r.substr(startpos, endpos - startpos)
+      var uuid = url.substr(url.lastIndexOf('/') + 1)
+      LoginPull(0, uuid)
+      return res.end('https://open.weixin.qq.com' + url)
+      // return res.end('<html><body><img src="https://open.weixin.qq.com' + url + '"></img></body></html>')
+    })
 })
 
 router.post('/setCookie', (req, res) => {
